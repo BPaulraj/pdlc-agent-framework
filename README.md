@@ -49,7 +49,7 @@ Agentic AI for the testing side of the product development lifecycle. It works w
 | 18 | `pdlc-regression-pack-curator` | — | *(optional)* Promote/update/retire master-pack cases; automation backlog |
 | 19 | `pdlc-retro-learner` | — | `/pdlc-retro`: learns from gate rejections and review loops, proposes guideline edits |
 
-Details: [docs/agent-catalog.md](docs/agent-catalog.md) · Flow and states: [docs/workflow.md](docs/workflow.md) · Controls: [docs/guardrails.md](docs/guardrails.md) · Design: [docs/architecture.md](docs/architecture.md) · Drift over time: [docs/evals.md](docs/evals.md)
+Details: [docs/agent-catalog.md](docs/agent-catalog.md) · Flow and states: [docs/workflow.md](docs/workflow.md) · Controls: [docs/guardrails.md](docs/guardrails.md) · Design: [docs/architecture.md](docs/architecture.md) · Drift over time: [docs/evals.md](docs/evals.md) · **Full process diagrams + reference tables (PDF): [docs/pdlc-knowledge-base.pdf](docs/pdlc-knowledge-base.pdf)**
 
 ## Setup
 
