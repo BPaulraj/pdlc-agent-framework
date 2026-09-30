@@ -1,0 +1,23 @@
+# Output of pdlc-automation-validator (12-validation/validation-report.yaml)
+# and pdlc-execution-triager (15-execution/execution-report.yaml)
+schema_version: 1
+story_id: "US-1234"
+decision: "approve | request_changes | blocked"
+# validator: request_changes = automation defect -> automation-design reworks the proposal
+#            blocked         = environment/config problem a human must fix
+summary: "..."
+environment: {worktree: "", branch: "", commit: "", target_env: "", browser: "", ran_at: ""}
+checks:
+  - name: "compile | dry_run | run_new | run_regression"
+    status: "passed | failed | skipped | timeout"
+    command: "..."
+    log: "runs/US-1234/12-validation/compile.log"
+    totals: {passed: 0, failed: 0, skipped: 0}
+failures:
+  - test: "Scenario name / TC key / ADO id"
+    classification: "automation_defect | product_defect | environment | test_data | flaky | inconclusive"
+    evidence: "log excerpt, file:line, screenshot path"
+    confidence: "high | medium | low"
+    recommended_action: "..."
+    defect_draft: null              # path to a defect draft (execution stage only)
+not_run: []                         # and why

@@ -1,0 +1,4 @@
+# No structured interface_details for this interface. Leave interface_details unset (or
+# {}) and rely on steps/expected_result/preconditions being fully explicit instead.
+# See guideline.md before treating this as a permanent choice for a recurring surface —
+# it's a signal to propose a new pack, not a normal end state.

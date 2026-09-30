@@ -1,0 +1,15 @@
+# Draft only. pdlc-execution-triager writes these to runs/<story>/15-execution/defects/<n>.yaml.
+# A human reviews and files them; the framework never creates Bugs automatically.
+schema_version: 1
+story_id: "US-1234"
+title: "<Area>: <observable wrong behaviour> when <condition>"
+severity: "1 - Critical | 2 - High | 3 - Medium | 4 - Low"
+environment: {env: "", build: "", browser_or_client: "", data: ""}
+preconditions: []
+repro_steps: []
+expected_result: "..."
+actual_result: "..."
+evidence: []                        # log excerpts, screenshots, request/response
+related_test_cases: []
+confidence_it_is_a_product_defect: "high | medium | low"
+alternative_explanations: []

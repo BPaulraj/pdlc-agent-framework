@@ -1,0 +1,28 @@
+# interface_details shape for interface: batch-async — see guideline.md.
+interface_details:
+  trigger: "schedule | queue_message | event | cli | api_triggered"
+  trigger_detail: "concrete trigger, e.g. cron expression, queue name, topic name"
+  input: {}                       # concrete synthetic message/file/args
+  completion_signal: "how completion is observed — poll field / output artifact / log line"
+  expected_side_effects: []       # specific, checkable outcomes — never "processing succeeds"
+  sla_seconds: null               # omit if the story states no timing requirement
+  retry_behaviour: null           # omit if not relevant to this case
+
+# --- worked example -------------------------------------------------------------
+# key: TC-US1234-006
+# title: "Verify nightly settlement job marks paid orders as 'settled' within SLA"
+# interface: batch-async
+# interface_details:
+#   trigger: schedule
+#   trigger_detail: "cron 0 2 * * *"
+#   input: {orders_paid_since: "2026-09-29T00:00:00Z"}
+#   completion_signal: "settlement_runs.status = 'complete' for today's run_id"
+#   expected_side_effects:
+#     - "3 orders (paid yesterday) move to status='settled' in the orders table"
+#     - "1 settlement_report.csv written to the reports bucket with 3 line items"
+#   sla_seconds: 300
+#   retry_behaviour: "idempotent on order_id; re-running the same window does not double-settle"
+# preconditions: ["3 orders exist with status='paid', paid_at yesterday", "No existing settlement_run for today"]
+# steps:
+#   - action: "Trigger the settlement job for today's scheduled window"
+#     expected_result: "settlement_runs.status = 'complete' within 300s; 3 orders now status='settled'; settlement_report.csv has 3 rows"

@@ -1,0 +1,15 @@
+Feature: ${capability_name}
+  As a ${user_role}
+  I want ${user_goal}
+  So that ${business_value}
+
+  Background:
+    Given ${shared_precondition_if_needed}
+
+  @${story_id} @${test_case_id}
+  Scenario: ${behavior_and_outcome}
+    Given ${initial_business_context}
+    When ${meaningful_user_or_system_action}
+    Then ${observable_business_outcome}
+
+# Keep scenarios focused on business behavior. Omit Background when it adds no clarity.

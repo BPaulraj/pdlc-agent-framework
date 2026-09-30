@@ -1,0 +1,37 @@
+# Output of pdlc-story-analyst -> runs/<story>/02-analysis/story-analysis.yaml
+schema_version: 1
+story_id: "US-1234"
+readiness: "ready | ready_with_assumptions | not_ready"
+invest_assessment:                  # short, evidence-based notes per INVEST letter
+  independent: "..."
+  negotiable: "..."
+  valuable: "..."
+  estimable: "..."
+  small: "..."
+  testable: "..."
+findings:                           # every issue found, whether or not it becomes a question
+  - id: F-1
+    category: "ambiguity | missing_requirement | contradiction | untestable | missing_nfr | dependency | data | permissions | error_handling | ui_state | scope"
+    detail: "precise description"
+    source_ref: "AC-2 | BR-1 | attachments/x.png"
+    impact_on_testing: "what cannot be designed/verified until resolved"
+questions:                          # raised in the 'To clarify with stakeholders' task
+  - id: Q-1
+    finding_refs: [F-1]
+    question: "one specific, answerable question (prefer closed or option-based)"
+    options: []                     # e.g. ["A: block checkout", "B: warn and continue"]
+    why_it_matters: "the test behaviour that depends on the answer"
+    blocking: true                  # true = test design must not proceed without the answer
+    proposed_assumption: null       # required when blocking is false
+    addressed_to: "PO | BA | Dev | UX"
+    status: open                    # open | answered (answered by an earlier round / updated AC)
+    answer_ref: null
+assumptions:                        # assumptions the pipeline will proceed with (non-blocking only)
+  - id: A-1
+    assumption: "..."
+    question_ref: Q-2
+out_of_scope: []                    # explicitly or implicitly excluded behaviour
+risks:
+  - risk: "..."
+    likelihood: "low | medium | high"
+    impact: "low | medium | high"

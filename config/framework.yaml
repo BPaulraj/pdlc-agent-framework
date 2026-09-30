@@ -1,0 +1,72 @@
+schema_version: 2
+# Secret-free. Secrets (ADO PAT) come from environment variables named here.
+
+framework:
+  name: testing-first-pdlc
+  runs_dir: runs                 # one folder per story: runs/US-<id>/
+  cache_dir: .pdlc/cache         # master-pack export, automation index
+  max_attempts_per_stage: 3      # an agent stage that fails this many times blocks the run
+  max_auto_rework_loops: 2       # reviewer-agent "request_changes" loops before a human must step in
+  max_clarification_rounds: 3
+
+paths:
+  # Absolute paths on this machine. Both are READ-ONLY for every agent (enforced by
+  # scripts/guard_writes.py). Approved automation changes are applied only by `pdlc.py apply`
+  # into a git worktree under worktrees_dir, never into your checkout.
+  application_repo: SET_ME       # e.g. D:/Projects/shop-app
+  automation_repo: SET_ME        # e.g. D:/Projects/shop-tests
+  worktrees_dir: .pdlc/worktrees
+
+azure_devops:
+  enabled: false                 # false = offline mode: stories from local JSON, ADO writes become local files
+  organization: SET_ME           # https://dev.azure.com/<organization>
+  project: SET_ME
+  team: SET_ME                   # used for @CurrentIteration in the sprint watcher
+  pat_env_var: ADO_PAT           # scopes: Work Items (Read & Write), Test Management (Read & Write)
+  api_version: "7.1"
+  story_types: [User Story, Product Backlog Item]
+  excluded_states: [Removed, Closed, Done]
+  start_tag: ""                  # optional: only pick up in-sprint stories carrying this tag
+  story_tag_on_start: pdlc-in-progress   # "" to disable tagging the story when a run starts
+
+  clarification:
+    task_title: To clarify with stakeholders
+    assign_to: ""                # PO/BA identity (email or display name); "" = unassigned
+    closed_states: [Closed, Done, Resolved]
+    tags: [pdlc, clarification]
+
+  test_plan:
+    plan_id: SET_ME              # plan where the sprint's new test cases go
+    parent_suite_id: SET_ME      # suite under which a per-story suite is created
+    suite_strategy: requirement_based   # requirement_based | static
+    create_regression_suite: true       # static suite "US-<id> regression" with the selected master-pack cases
+    area_path: ""                # "" = inherit from story
+    tags: [pdlc-generated]
+
+  master_pack:
+    source: ado_test_plan        # ado_test_plan | local_jsonl
+    plan_id: SET_ME              # regression/master plan
+    local_path: ""               # used when source = local_jsonl (one test case JSON per line)
+    max_age_hours: 24            # re-export when older
+
+automation:
+  base_ref: main                 # branch/commit the worktree is created from
+  branch_prefix: pdlc/
+  language_pack: discover        # discover | java-cucumber | <folder under language-packs/>
+  # Allowlisted commands the validator may run inside the worktree. Empty = not run (reported as skipped).
+  # {tags} is replaced with the story's scenario tag expression, e.g. "@US-1234".
+  checks:
+    compile: ""                  # e.g. mvn -q -DskipTests test-compile
+    dry_run: ""                  # e.g. mvn -q test -Dcucumber.execution.dry-run=true -Dcucumber.filter.tags="{tags}"
+    run_new: ""                  # e.g. mvn -q test -Dcucumber.filter.tags="{tags}"
+    run_regression: ""           # e.g. mvn -q test -Dcucumber.filter.tags="@regression and ({tags})"
+  check_timeout_seconds: 1800
+  source_globs: ["**/*.feature", "**/*.java", "**/*.kt", "**/*.ts", "**/*.js", "**/*.py", "**/*.cs", "**/*.rb", "**/*.go"]
+  ignore_dirs: [.git, node_modules, target, build, dist, bin, obj, .venv, venv, .idea, .vscode]
+
+stages:                          # optional stages; core stages cannot be disabled
+  impact_analysis: true
+  test_strategy: true
+  test_data: true
+  execution: false               # needs checks.run_regression and a reachable test environment
+  pack_curation: true

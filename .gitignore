@@ -1,0 +1,11 @@
+# Per-story run artifacts (may contain story text and attachments) and local caches
+runs/
+.pdlc/
+retro/
+__pycache__/
+*.pyc
+
+# Golden-set eval baselines (scripts/golden_eval.py): may contain real story content,
+# same retention concern as runs/. Force-add (`git add -f`) a specific case if you want
+# it version-controlled, e.g. one built from examples/stories/.
+golden/

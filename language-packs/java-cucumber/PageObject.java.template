@@ -1,0 +1,33 @@
+package ${base_package}.pages;
+
+import org.openqa.selenium.By;
+import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.support.ui.ExpectedConditions;
+import org.openqa.selenium.support.ui.WebDriverWait;
+
+import java.time.Duration;
+
+/**
+ * ${ScreenName} screen. Intention-level actions only; no assertions here.
+ * Prefer extending an existing page object over creating a new one.
+ */
+public class ${PageClass} {
+
+    private final WebDriver driver;
+    private final WebDriverWait wait;
+
+    private final By ${elementName} = By.cssSelector("[data-testid='${test_id}']");
+
+    public ${PageClass}(WebDriver driver) {
+        this.driver = driver;
+        this.wait = new WebDriverWait(driver, Duration.ofSeconds(${default_timeout_seconds}));
+    }
+
+    public void ${pageAction}(String value) {
+        wait.until(ExpectedConditions.elementToBeClickable(${elementName})).sendKeys(value);
+    }
+
+    public String ${pageQuery}() {
+        return wait.until(ExpectedConditions.visibilityOfElementLocated(${elementName})).getText();
+    }
+}

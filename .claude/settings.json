@@ -1,0 +1,29 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(python scripts/pdlc.py:*)",
+      "Bash(python scripts/ado.py:*)",
+      "Bash(python scripts/index_steps.py:*)",
+      "Bash(python scripts/extract_attachments.py:*)",
+      "Bash(python scripts/golden_eval.py:*)",
+      "Bash(python scripts/gate_metrics.py:*)"
+    ],
+    "deny": [
+      "Bash(git push:*)",
+      "Bash(git -C * push:*)"
+    ]
+  },
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Write|Edit|MultiEdit|NotebookEdit|Bash|PowerShell",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python \"$CLAUDE_PROJECT_DIR/scripts/guard_writes.py\""
+          }
+        ]
+      }
+    ]
+  }
+}

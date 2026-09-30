@@ -1,0 +1,42 @@
+# Output of pdlc-test-designer -> runs/<story>/06-test-design/test-cases.yaml
+# The ADO adapter maps title, ordered steps[action, expected_result], priority, tags and a
+# description built from objective/preconditions/test_data/refs/interface into ADO Test Case work items.
+#
+# This envelope is interface-neutral. `interface` names which test-design-packs/<name>/
+# pack this case follows (web-ui | api | batch-async | db-validation | other, or a pack
+# your team added — see test-design-packs/README.md); `interface_details` is that pack's
+# structured shape, worked example in test-design-packs/<name>/test-case-contract.yaml.
+# One story's test-cases.yaml can mix interfaces freely; only these two fields vary.
+schema_version: 2
+story_id: "US-1234"
+story_title: "..."
+coverage_summary:                   # every refined AC must appear here
+  - acceptance_criterion: AC-1
+    test_cases: [TC-US1234-001, TC-US1234-002]
+test_cases:
+  - key: TC-US1234-001              # stable key, never reused; survives reworks
+    title: "Verify <behaviour> when <condition>"    # unique; <= 128 chars
+    objective: "the single behaviour this case proves"
+    type: "positive | negative | boundary | permission | state_transition | error_handling | integration | ui | accessibility | security"
+    technique: "equivalence_partitioning | boundary_value | decision_table | state_transition | use_case | error_guessing | pairwise"
+    priority: 1                     # 1 critical .. 4 low (ADO scale)
+    interface: "web-ui"             # test-design-packs/<interface>/ — web-ui | api | batch-async | db-validation | other | team-added pack
+    interface_details: {}           # shape from test-design-packs/<interface>/test-case-contract.yaml; {} is valid (esp. web-ui, other)
+    preconditions:
+      - "User 'standard_customer' is logged in"
+    test_data_refs: [TD-1]          # ids from 07-test-data plan (filled in after the test-data stage)
+    test_data: {}                   # inline values when simple, e.g. {coupon: "SAVE10", cart_total: 100.00}
+    steps:
+      - action: "Navigate to the cart page"
+        expected_result: "Cart page shows 1 item with subtotal $100.00"
+      - action: "Enter coupon code 'SAVE10' and select Apply"
+        expected_result: "Discount line shows -$10.00 and total shows $90.00"
+    acceptance_criteria_refs: [AC-1]
+    requirement_refs: [BR-1]        # business rules / clarified answers (Q-1) covered
+    assumption_refs: []             # A-n this case depends on
+    automation:
+      candidate: true
+      level: "ui | api | component"
+      reason: "stable, high value, repeated each release"
+      scenario_ref: null            # filled by automation design, e.g. features/checkout/coupon.feature:12
+    tags: [checkout, coupon]

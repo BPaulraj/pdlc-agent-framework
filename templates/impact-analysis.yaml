@@ -1,0 +1,25 @@
+# Output of pdlc-impact-analyst -> runs/<story>/04-impact/impact-analysis.yaml
+schema_version: 1
+story_id: "US-1234"
+application_repo_revision: "commit or 'working copy'"
+functional_modules:                 # business capabilities affected
+  - module: "Checkout > Promotions"
+    change_type: "new | modified | indirectly_affected"
+    confidence: "high | medium | low"
+    evidence: ["src/checkout/promo/CouponService.java:42 - applies discounts", "AC-3"]
+code_components:                    # concrete code likely to change or be touched
+  - path: "src/checkout/promo/CouponService.java"
+    kind: "service | controller | ui | api | db | config | job | integration"
+    reason: "..."
+interfaces:                         # APIs, events, DB tables, files, third parties
+  - name: "POST /api/cart/{id}/coupon"
+    change: "new | contract_change | behaviour_change | unchanged_consumer"
+    consumers: []
+dependencies_at_risk:               # modules sharing code/data with the change -> regression candidates
+  - module: "Order history"
+    via: "shared OrderTotal calculation"
+    risk: "medium"
+existing_automation_touchpoints:    # automation repo areas that exercise these modules
+  - path: "src/test/resources/features/checkout/*.feature"
+    note: "..."
+unknowns: []                        # what could not be determined from the code

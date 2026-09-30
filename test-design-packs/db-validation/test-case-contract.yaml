@@ -1,0 +1,26 @@
+# interface_details shape for interface: db-validation — see guideline.md.
+interface_details:
+  seed_data: {}          # concrete before-state: rows/fixtures, synthetic
+  action: "migration | ETL job | trigger | direct query — be specific"
+  target: "table/view/report the assertion reads"
+  assertions: []         # exact values/invariants, not just row presence
+  isolation: "how this run's data is isolated and reset"
+
+# --- worked example -------------------------------------------------------------
+# key: TC-US1234-007
+# title: "Verify nightly DWH load sums line items correctly for a multi-item order"
+# interface: db-validation
+# interface_details:
+#   seed_data:
+#     orders: [{order_id: 1001, customer_id: 42}]
+#     line_items: [{order_id: 1001, amount: 40.00}, {order_id: 1001, amount: 60.00}]
+#   action: "ETL job 'orders_to_dwh', full run"
+#   target: "orders_dwh"
+#   assertions:
+#     - "orders_dwh.total_amount = 100.00 for order_id=1001"
+#     - "exactly 1 row in orders_dwh for order_id=1001 (no duplication)"
+#   isolation: "dedicated dwh_test schema, truncated before each run"
+# preconditions: ["Seed data loaded into source schema per interface_details.seed_data", "dwh_test schema is empty"]
+# steps:
+#   - action: "Run the 'orders_to_dwh' ETL job against the seeded source schema"
+#     expected_result: "orders_dwh has exactly 1 row for order_id=1001 with total_amount = 100.00"

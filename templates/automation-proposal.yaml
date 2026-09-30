@@ -1,0 +1,34 @@
+# Output of pdlc-automation-designer -> runs/<story>/10-automation-design/proposal.yaml
+# Every file listed here must also be staged with its COMPLETE final content at
+#   runs/<story>/10-automation-design/files/<path>
+# `pdlc.py seal-proposal` rejects undeclared, missing or unsafe files. Deletes are not allowed.
+schema_version: 2
+story_id: "US-1234"
+based_on_test_artifact: "runs/US-1234/06-test-design/test-cases.yaml"
+repo_profile: ".pdlc/cache/automation-index/repo-profile.yaml"
+summary: "what is being automated and why this is the minimal change"
+scenario_map:                       # approved test case -> scenario (or reason it is not automated)
+  - test_case: TC-US1234-001
+    scenario: "src/test/resources/features/checkout/coupon.feature: Apply a valid percentage coupon"
+    status: "automated | not_automated"
+    reason: null
+files:
+  - path: "src/test/resources/features/checkout/coupon.feature"   # relative to the automation repo root
+    operation: "create | modify"
+    purpose: "why this file must be created/changed"
+    template_id: "templates/feature.feature.template"
+    change_summary: "for modify: exactly which lines/methods are added or changed"
+reuse:
+  steps_reused:                     # existing step definitions used as-is
+    - step: "Given I am logged in as {string}"
+      defined_at: "src/test/java/.../LoginSteps.java:18"
+  components_reused: []             # page objects, API clients, builders, hooks
+  new_components:                   # every new class/method/step, with proof nothing existing fits
+    - name: "CouponSteps.applyCoupon"
+      why_new: "no step applies a coupon; searched step-catalog for 'coupon|promo|discount|voucher'"
+  searched: ["step-catalog.md: coupon|promo|discount|voucher", "components.md: Cart*"]
+step_bindings: []                   # see templates/step-binding-contract.yaml
+checks:
+  expected_commands: []
+  risks: []
+  not_covered: []

@@ -1,0 +1,222 @@
+# PDLC testing pipeline — single source of truth for stage order, agents, gates and artifacts.
+# `scripts/pdlc.py next <story>` walks this list top to bottom and returns the first stage that
+# still needs work. Paths in `outputs` are relative to runs/<story>/ unless they start with {cache}.
+#
+# kinds:
+#   agent  - a Claude Code subagent (.claude/agents/<agent>.md) produces the outputs
+#   script - a deterministic command produces the outputs (no LLM involved)
+#   wait   - the run pauses until an external condition is true (e.g. PO/BA answered)
+#   gate   - the run pauses until a human approves the exact hash of `review` artifacts
+#
+# conditions (implemented in scripts/pdlc.py CONDITIONS):
+#   enabled_by   - config key under `stages:` that must be true
+#   run_if       - named condition that must be true, otherwise the stage is skipped
+#   on_complete  - post-check that can send the run back for rework
+
+schema_version: 1
+
+stages:
+  # ---------------------------------------------------------------- Phase A: understand the story
+  - id: intake
+    kind: agent
+    agent: pdlc-story-intake
+    before: ["python scripts/ado.py fetch-story {story}", "python scripts/extract_attachments.py {story}"]
+    outputs: [01-intake/context.yaml]
+    guidelines: [guidelines/agent-contract.md]
+    templates: [templates/context-manifest.yaml]
+
+  - id: analysis
+    kind: agent
+    agent: pdlc-story-analyst
+    outputs: [02-analysis/story-analysis.yaml]
+    guidelines: [guidelines/agent-contract.md, guidelines/story-analysis.md]
+    templates: [templates/story-analysis.yaml]
+
+  - id: raise-clarification
+    kind: script
+    run_if: has_open_questions
+    command: "python scripts/ado.py raise-clarifications {story}"
+    outputs: [02-analysis/clarification-task.json]
+
+  - id: await-clarification
+    kind: wait
+    run_if: has_open_questions
+    until: clarification_answered
+    message: "Waiting for PO/BA to answer the 'To clarify with stakeholders' task and move it to a closed state."
+
+  - id: clarification-resolution
+    kind: agent
+    agent: pdlc-clarification-resolver
+    run_if: has_open_questions
+    before: ["python scripts/ado.py fetch-clarifications {story}"]
+    outputs: [03-clarification/resolved-requirements.yaml]
+    guidelines: [guidelines/agent-contract.md, guidelines/story-analysis.md]
+    templates: [templates/resolved-requirements.yaml]
+    on_complete: {check: clarification_loop, rework_to: raise-clarification}
+
+  # ---------------------------------------------------------------- Phase B: design the tests
+  - id: impact-analysis
+    kind: agent
+    agent: pdlc-impact-analyst
+    enabled_by: impact_analysis
+    outputs: [04-impact/impact-analysis.yaml]
+    guidelines: [guidelines/agent-contract.md, guidelines/regression-selection.md]
+    templates: [templates/impact-analysis.yaml]
+
+  - id: test-strategy
+    kind: agent
+    agent: pdlc-test-strategist
+    enabled_by: test_strategy
+    outputs: [05-strategy/test-strategy.yaml]
+    guidelines: [guidelines/agent-contract.md, guidelines/test-design.md, test-design-packs/README.md]
+    templates: [templates/test-strategy.yaml]
+
+  - id: test-design
+    kind: agent
+    agent: pdlc-test-designer
+    outputs: [06-test-design/test-cases.yaml]
+    guidelines: [guidelines/agent-contract.md, guidelines/test-design.md, "test-design-packs/"]
+    templates: [templates/functional-test-case.yaml]
+
+  - id: test-data
+    kind: agent
+    agent: pdlc-test-data-designer
+    enabled_by: test_data
+    outputs: [07-test-data/test-data-plan.yaml]
+    guidelines: [guidelines/agent-contract.md, guidelines/test-data.md]
+    templates: [templates/test-data-plan.yaml]
+
+  - id: regression-selection
+    kind: agent
+    agent: pdlc-regression-selector
+    before: ["python scripts/ado.py export-master-pack --if-stale"]
+    outputs: [08-regression/regression-selection.yaml]
+    guidelines: [guidelines/agent-contract.md, guidelines/regression-selection.md]
+    templates: [templates/regression-selection.yaml]
+
+  - id: test-review
+    kind: agent
+    agent: pdlc-test-reviewer
+    outputs: [09-test-review/review-report.yaml]
+    guidelines: [guidelines/agent-contract.md, guidelines/review-checklists.md, guidelines/test-design.md]
+    templates: [templates/review-report.yaml]
+    on_complete: {check: review_decision, report: 09-test-review/review-report.yaml, rework_to: test-design}
+
+  - id: G1-test-approval
+    kind: gate
+    title: "Approve functional test cases, test data and regression selection"
+    review:
+      - 05-strategy/test-strategy.yaml
+      - 06-test-design/test-cases.yaml
+      - 07-test-data/test-data-plan.yaml
+      - 08-regression/regression-selection.yaml
+      - 09-test-review/review-report.yaml
+    rework_to: test-design
+
+  # ---------------------------------------------------------------- Phase C: automate
+  - id: automation-index
+    kind: agent
+    agent: pdlc-automation-indexer
+    run_if: automation_index_stale
+    before: ["python scripts/index_steps.py"]
+    outputs: ["{cache}/automation-index/repo-profile.yaml", "{cache}/automation-index/components.md"]
+    guidelines: [guidelines/agent-contract.md, guidelines/automation-design.md]
+    templates: [templates/repo-profile.yaml]
+
+  - id: automation-design
+    kind: agent
+    agent: pdlc-automation-designer
+    outputs: [10-automation-design/proposal.yaml]
+    guidelines:
+      - guidelines/agent-contract.md
+      - guidelines/automation-design.md
+      - guidelines/bdd-best-practices.md
+      - guidelines/coding-standards.md
+    templates:
+      - templates/automation-proposal.yaml
+      - templates/feature.feature.template
+      - templates/step-binding-contract.yaml
+
+  - id: seal-proposal
+    kind: script
+    command: "python scripts/pdlc.py seal-proposal {story}"
+    outputs: [10-automation-design/sealed.json]
+
+  - id: G2-automation-design-approval
+    kind: gate
+    title: "Approve the automation proposal (exact files) before anything touches the automation repo"
+    review:
+      - 10-automation-design/
+    rework_to: automation-design
+
+  - id: automation-apply
+    kind: agent
+    agent: pdlc-automation-applier
+    outputs: [11-apply/apply-report.yaml]
+    guidelines: [guidelines/agent-contract.md]
+    templates: []
+
+  - id: automation-validate
+    kind: agent
+    agent: pdlc-automation-validator
+    outputs: [12-validation/validation-report.yaml]
+    guidelines: [guidelines/agent-contract.md, guidelines/automation-design.md]
+    templates: [templates/execution-report.yaml]
+    on_complete: {check: review_decision, report: 12-validation/validation-report.yaml, rework_to: automation-design}
+
+  - id: automation-review
+    kind: agent
+    agent: pdlc-automation-reviewer
+    outputs: [13-automation-review/review-report.yaml]
+    guidelines:
+      - guidelines/agent-contract.md
+      - guidelines/review-checklists.md
+      - guidelines/bdd-best-practices.md
+      - guidelines/coding-standards.md
+    templates: [templates/review-report.yaml]
+    on_complete: {check: review_decision, report: 13-automation-review/review-report.yaml, rework_to: automation-design}
+
+  - id: G3-automation-and-publish-approval
+    kind: gate
+    title: "Accept the applied automation branch and authorise publishing test cases to ADO"
+    review:
+      - 11-apply/
+      - 12-validation/validation-report.yaml
+      - 13-automation-review/review-report.yaml
+    rework_to: automation-design
+
+  # ---------------------------------------------------------------- Phase D: publish, execute, report
+  - id: ado-publish
+    kind: agent
+    agent: pdlc-ado-publisher
+    outputs: [14-publish/publish-receipt.json]
+    guidelines: [guidelines/agent-contract.md]
+    templates: []
+
+  - id: execution
+    kind: agent
+    agent: pdlc-execution-triager
+    enabled_by: execution
+    outputs: [15-execution/execution-report.yaml]
+    guidelines: [guidelines/agent-contract.md, guidelines/defect-reporting.md]
+    templates: [templates/execution-report.yaml, templates/defect-draft.yaml]
+
+  - id: traceability-report
+    kind: agent
+    agent: pdlc-traceability-reporter
+    outputs: [16-report/traceability-report.md]
+    guidelines: [guidelines/agent-contract.md]
+    templates: [templates/traceability-report.md]
+
+  - id: post-report
+    kind: script
+    command: "python scripts/ado.py post-report {story}"
+    outputs: [16-report/post-receipt.json]
+
+  - id: pack-curation
+    kind: agent
+    agent: pdlc-regression-pack-curator
+    enabled_by: pack_curation
+    outputs: [17-curation/pack-curation.yaml]
+    guidelines: [guidelines/agent-contract.md, guidelines/regression-selection.md]
+    templates: [templates/pack-curation.yaml]

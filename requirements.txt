@@ -1,0 +1,8 @@
+PyYAML>=6.0
+
+# scripts/extract_attachments.py: convert story attachments Claude's Read tool can't parse
+# natively (images and PDFs already work without these) into a plain-text/markdown sidecar
+# for the intake agent to read. Legacy binary .doc/.xls are out of scope — see the script's
+# docstring.
+python-docx>=1.1
+openpyxl>=3.1

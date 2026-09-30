@@ -1,0 +1,18 @@
+# Output of pdlc-clarification-resolver -> runs/<story>/03-clarification/resolved-requirements.yaml
+schema_version: 1
+story_id: "US-1234"
+status: "resolved | needs_follow_up"
+answers:
+  - question_id: Q-1
+    answer: "what the PO/BA said, faithfully paraphrased"
+    answered_by: "name/role if known"
+    source_ref: "answers-round-1.md | story.acceptance_criteria (updated) | comment <date>"
+    resolution: "resolved | partially_resolved | unanswered | contradicts_story"
+    resulting_requirement: "testable statement derived from the answer"
+refined_acceptance_criteria:        # AC after clarification — the baseline for test design
+  - id: AC-1
+    text: "..."
+    origin: "original | clarified (Q-1) | new (Q-3)"
+confirmed_assumptions: []           # non-blocking assumptions the PO/BA accepted or did not object to
+rejected_assumptions: []
+follow_up_questions: []             # same shape as story-analysis questions; only when status = needs_follow_up

@@ -1,0 +1,36 @@
+package ${base_package}.steps;
+
+import ${base_package}.context.ScenarioContext;
+import ${base_package}.pages.${PageClass};
+import io.cucumber.java.en.Given;
+import io.cucumber.java.en.Then;
+import io.cucumber.java.en.When;
+
+import static org.assertj.core.api.Assertions.assertThat;
+
+/**
+ * Steps for ${capability}. Thin glue: parse, delegate to page objects/clients, assert.
+ * Story: ${story_id}
+ */
+public class ${Domain}Steps {
+
+    private final ScenarioContext context;
+    private final ${PageClass} ${pageField};
+
+    public ${Domain}Steps(ScenarioContext context, ${PageClass} ${pageField}) {
+        this.context = context;
+        this.${pageField} = ${pageField};
+    }
+
+    @When("${step_text_with_cucumber_expressions}")
+    public void ${stepMethod}(String ${param}) {
+        ${pageField}.${pageAction}(${param});
+    }
+
+    @Then("${assertion_step_text}")
+    public void ${assertionMethod}(String expected) {
+        assertThat(${pageField}.${pageQuery}())
+                .as("${business_expectation}")
+                .isEqualTo(expected);
+    }
+}

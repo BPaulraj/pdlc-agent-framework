@@ -1,0 +1,27 @@
+# interface_details shape for interface: api — see guideline.md.
+interface_details:
+  method: "GET | POST | PUT | PATCH | DELETE"
+  endpoint: "/path/template/{id}"      # template, not a resolved URL — no real hosts/ports
+  auth: "role/scope required"
+  request_body: {}                     # omit for GET/DELETE with no body
+  expected_status: 200
+  expected_response: {}                # the specific fields/values this case checks, not the full schema
+  headers: {}                          # only when a specific header matters to this case
+
+# --- worked example -------------------------------------------------------------
+# key: TC-US1234-005
+# title: "Verify applying an expired coupon returns 422 with the specific error code"
+# interface: api
+# interface_details:
+#   method: POST
+#   endpoint: "/carts/{cartId}/coupon"
+#   auth: "customer, own cart only"
+#   request_body: {code: "EXPIRED10"}
+#   expected_status: 422
+#   expected_response:
+#     error_code: "COUPON_EXPIRED"
+#     message: "This coupon has expired"
+# preconditions: ["Cart {cartId} has 1 item, subtotal $100.00", "Coupon 'EXPIRED10' expired 2026-01-01"]
+# steps:
+#   - action: "POST /carts/{cartId}/coupon with body {code: 'EXPIRED10'}"
+#     expected_result: "422; body.error_code == 'COUPON_EXPIRED'; cart total unchanged at $100.00"

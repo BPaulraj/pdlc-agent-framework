@@ -1,0 +1,20 @@
+{
+  "id": 1001,
+  "rev": 1,
+  "type": "User Story",
+  "title": "Apply a discount coupon at checkout",
+  "state": "New",
+  "area_path": "Shop\\Checkout",
+  "iteration_path": "Shop\\Sprint 42",
+  "tags": ["checkout", "promotions"],
+  "description_text": "As a registered customer I want to apply a discount coupon to my cart at checkout so that I pay less for eligible orders.\n\nMarketing will run percentage and fixed-amount coupons. Coupons can have a minimum spend and an expiry date. The discount should be shown clearly before payment.",
+  "acceptance_criteria_text": "1. Customer can enter a coupon code on the cart page and apply it.\n2. A valid coupon reduces the order total and shows the discount as a separate line.\n3. Invalid or expired coupons show an appropriate error message.\n4. Only one coupon can be used per order.\n5. The discount must not make the total negative.",
+  "attachments": [],
+  "links": [
+    {"rel": "System.LinkTypes.Hierarchy-Reverse", "name": "Parent", "id": 900, "title": "Promotions MVP", "type": "Feature", "state": "Active",
+     "description_text": "Enable marketing-driven promotions (coupons now, automatic discounts later) across web checkout."}
+  ],
+  "comments": [
+    {"by": "Product Owner", "at": "2026-09-20T10:00:00Z", "text": "Fixed-amount coupons are in scope for this sprint as well."}
+  ]
+}

@@ -1,0 +1,27 @@
+# Output of pdlc-test-reviewer and pdlc-automation-reviewer
+schema_version: 2
+story_id: "US-1234"
+review_type: "test_design | automation"
+reviewed_artifacts:
+  - path: "runs/US-1234/06-test-design/test-cases.yaml"
+decision: "approve | request_changes | blocked"
+# approve         - ready for the human gate
+# request_changes - sent back to the producing agent automatically (bounded by framework.max_auto_rework_loops)
+# blocked         - needs a human (missing info, environment down, conflicting instructions)
+summary: "2-3 sentences a human approver can act on"
+findings:
+  - id: R-1
+    severity: "blocking | major | minor | note"
+    category: "coverage | traceability | clarity | duplication | expected_result | data | regression | scope | reuse | standards | security | maintainability | flakiness"
+    location: "TC-US1234-003 step 2 | src/test/java/.../CouponSteps.java:41"
+    finding: "specific, verifiable problem"
+    evidence: "quote or reference"
+    required_change: "actionable instruction for the producing agent"
+coverage_matrix:                    # test_design reviews: AC -> cases, plus verdict
+  - acceptance_criterion: AC-1
+    covered_by: []
+    verdict: "covered | partial | missing"
+out_of_scope_changes: []            # automation reviews: anything outside the approved manifest/story
+checks_run: []
+checks_not_run: []
+strengths: []                       # brief; helps humans trust an approve decision

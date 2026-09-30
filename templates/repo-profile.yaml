@@ -1,0 +1,33 @@
+# Output of pdlc-automation-indexer -> .pdlc/cache/automation-index/repo-profile.yaml
+schema_version: 1
+repository: "path"
+indexed_commit: "sha from index-meta.json"
+language: "java | kotlin | typescript | javascript | python | csharp | ruby | go"
+language_pack: "java-cucumber"      # folder under language-packs/ that fits, or "none: <describe>"
+test_framework: "cucumber-jvm + junit5 | playwright-bdd | behave | pytest-bdd | reqnroll | ..."
+ui_driver: "selenium | playwright | cypress | appium | none"
+api_client: "rest-assured | axios | requests | httpclient | none"
+build_tool: "maven | gradle | npm | pnpm | pip | poetry | dotnet"
+layout:
+  features: "src/test/resources/features/<domain>/"
+  step_definitions: "src/test/java/<pkg>/steps/<Domain>Steps.java"
+  page_objects: "src/test/java/<pkg>/pages/<Name>Page.java"
+  api_clients: "..."
+  test_data: "..."
+  hooks: "..."
+  config: "..."
+conventions:
+  naming: ["StepDefs end with 'Steps'", "page objects end with 'Page'"]
+  step_style: "business language, cucumber expressions"
+  tags: ["@regression", "@smoke", "@US-<id>", "@TC-<key>"]
+  waits_and_sync: "explicit waits via WaitUtils; no Thread.sleep"
+  assertions: "AssertJ"
+  dependency_injection: "PicoContainer ScenarioContext"
+  data_handling: "builders in testdata/, no hard-coded credentials"
+suggested_checks:                   # humans copy these into config automation.checks after verifying them
+  compile: "mvn -q -DskipTests test-compile"
+  dry_run: "..."
+  run_new: "..."
+  run_regression: "..."
+reuse_hotspots: []                  # most reused steps/components worth knowing
+smells: []                          # duplication, dead steps, sleeps — informational only

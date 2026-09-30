@@ -1,0 +1,32 @@
+# Output of pdlc-regression-selector -> runs/<story>/08-regression/regression-selection.yaml
+schema_version: 1
+story_id: "US-1234"
+master_pack_snapshot: "exported_at from .pdlc/cache/master-pack/meta.json"
+selection_basis:                    # impacted modules / dependencies from impact analysis and story
+  - module: "Checkout > Promotions"
+    reason: "directly modified"
+selected:
+  - id: 20431                       # ADO test case id (or master-pack id)
+    title: "..."
+    suite: "Regression / Checkout / Promotions"
+    module: "Checkout > Promotions"
+    reason: "directly exercises the discount calculation this story changes"
+    relation: "direct | dependency | shared_data | shared_ui | integration | historical_defect_area"
+    priority: "must_run | should_run | could_run"
+    automated: true
+    needs_update: false             # true when this story changes the expected behaviour of the case
+    update_note: null
+excluded_near_misses:               # plausible candidates deliberately left out
+  - id: 20455
+    title: "..."
+    reason: "covers gift cards, which share no code path with coupons"
+gaps:                               # impacted behaviour with no master-pack coverage
+  - module: "Order history"
+    missing: "no test verifies discounted totals appear in order history"
+    recommendation: "add to master pack after this sprint (see pack curation)"
+obsolete_candidates: []             # master-pack cases this story makes invalid
+execution_estimate:
+  must_run: 0
+  should_run: 0
+  could_run: 0
+  automated_share: "0%"

@@ -1,0 +1,18 @@
+# Output of pdlc-regression-pack-curator -> runs/<story>/17-curation/pack-curation.yaml
+# Proposals only; a human updates the master pack.
+schema_version: 1
+story_id: "US-1234"
+promote_to_master_pack:
+  - test_case: TC-US1234-001
+    ado_id: null
+    target_suite: "Regression / Checkout / Promotions"
+    reason: "covers core, long-lived behaviour"
+    tags_to_add: ["regression"]
+keep_story_only: []                 # one-off cases (migration, temporary flag) with reason
+update_existing:
+  - ado_id: 20431
+    change: "expected total now reflects coupon rounding rule (Q-2)"
+retire_or_merge:
+  - ado_id: 20455
+    reason: "duplicate of 20431 after this story"
+automation_backlog: []              # master-pack cases worth automating next, with value rationale

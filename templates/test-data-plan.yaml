@@ -1,0 +1,18 @@
+# Output of pdlc-test-data-designer -> runs/<story>/07-test-data/test-data-plan.yaml
+schema_version: 1
+story_id: "US-1234"
+data_sets:
+  - id: TD-1
+    purpose: "valid percentage coupon on a cart above minimum spend"
+    used_by: [TC-US1234-001]
+    entities:
+      - entity: "Coupon"
+        values: {code: "SAVE10", type: "percent", value: 10, min_spend: 50, expiry: "today+30d"}
+    source: "synthetic | existing-fixture | factory/builder | api-seed | db-seed | masked-copy"
+    existing_asset_ref: null        # automation repo fixture/builder to reuse, file:line
+    setup: "how it is created (API call, fixture, seed script)"
+    teardown: "how it is removed/reset"
+    boundaries_covered: ["min_spend - 0.01", "min_spend", "min_spend + 0.01"]
+    sensitive: false                # true -> must be masked/synthetic; never real customer data
+environment_dependencies: []        # feature flags, config, third-party sandboxes, clock control
+data_risks: []                      # shared/mutable data, ordering, time zones, parallel runs

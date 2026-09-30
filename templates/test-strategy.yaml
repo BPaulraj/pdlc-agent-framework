@@ -1,0 +1,27 @@
+# Output of pdlc-test-strategist -> runs/<story>/05-strategy/test-strategy.yaml
+schema_version: 1
+story_id: "US-1234"
+risk_based_priorities:
+  - area: "discount calculation"
+    risk: "high"
+    rationale: "money; shared with order totals"
+test_levels:                        # where each concern is best tested
+  - level: "ui-e2e | api | integration | component | manual-exploratory"
+    interface: "web-ui | api | batch-async | db-validation | other"   # test-design-packs/<name>/ this concern's cases should follow
+    concerns: []
+test_types_in_scope: ["functional", "negative", "boundary", "permissions"]   # + accessibility, security, performance, compatibility, localisation when relevant
+test_types_out_of_scope:
+  - type: "performance"
+    reason: "..."
+techniques_to_apply:                # guides the test designer
+  - technique: "boundary_value | equivalence_partitioning | decision_table | state_transition | pairwise | use_case | error_guessing"
+    applies_to: ["AC-2"]
+environments_and_config: []         # browsers/devices/locales/feature flags needed
+entry_criteria: []
+exit_criteria: []
+automation_approach:
+  candidates: "which cases should be automated and at which level"
+  not_automated: "which stay manual and why"
+exploratory_charters:               # session-based testing ideas scripted cases won't catch
+  - charter: "Explore <area> with <resources> to discover <information>"
+    timebox_minutes: 60

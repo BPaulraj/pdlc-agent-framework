@@ -1,0 +1,27 @@
+# Output of pdlc-story-intake -> runs/<story>/01-intake/context.yaml
+schema_version: 1
+story_id: "US-1234"
+title: "..."
+summary: "2-4 sentences: who needs what and why, in business terms"
+business_rules:                     # rules stated in description / AC / attachments
+  - id: BR-1
+    rule: "..."
+    source_ref: "story.description | story.acceptance_criteria | attachments/<file> p.<n> | link #<id>"
+acceptance_criteria:                # normalised, one testable statement each; keep original numbering if any
+  - id: AC-1
+    text: "..."
+    source_ref: "story.acceptance_criteria"
+actors_and_roles: []                # e.g. ["Registered customer", "Store admin"]
+systems_and_interfaces: []          # UIs, APIs, batch jobs, third parties mentioned
+data_entities: []                   # business objects/fields involved
+attachments:
+  - name: "..."
+    kind: "mockup | spec | sample-data | log | other"
+    extracted: "what was learned from it, with page/section refs"
+    unreadable_reason: null
+linked_work:
+  - id: 0
+    relation: "parent | related | dependency | child"
+    relevance: "why it matters for testing"
+prior_clarifications: []            # Q&A found in earlier clarification tasks or comments
+missing_inputs: []                  # things a tester would expect but that are absent (e.g. "no mockup for error state")

@@ -1,0 +1,17 @@
+# Optional interface_details shape for interface: web-ui — see guideline.md.
+# Most web-ui cases set interface_details: {} (or omit the key); fill it in only when the
+# case's behaviour genuinely depends on viewport or browser, not as a default habit.
+interface_details:
+  viewport: "mobile | tablet | desktop"    # omit if behaviour is viewport-independent
+  browser: "chromium | firefox | webkit"   # omit if behaviour is browser-independent
+
+# --- worked example -------------------------------------------------------------
+# key: TC-US1234-004
+# title: "Verify coupon field rejects a code over 20 characters on mobile"
+# interface: web-ui
+# interface_details:
+#   viewport: mobile
+# preconditions: ["Cart has 1 item", "Viewport is set to 375x812 (iPhone SE)"]
+# steps:
+#   - action: "Enter a 21-character coupon code and select Apply"
+#     expected_result: "Field shows error 'Coupon code must be 20 characters or fewer'; Apply is disabled"

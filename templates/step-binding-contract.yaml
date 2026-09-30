@@ -1,0 +1,19 @@
+schema_version: 1
+story_id: "${story_id}"
+feature_ref: "${relative_feature_path}"
+bindings:
+  - step_text: "${exact_feature_step_text}"
+    semantic_intent: "${business_action_or_assertion}"
+    binding_kind: action
+    parameters: []
+    reuse_candidate_refs: []
+    implementation:
+      language_pack: "${repository_language_pack}"
+      template_id: "${versioned_step_template_id}"
+      proposed_file: "${relative_path}"
+      proposed_content: "${language_specific_code}"
+    assertion_evidence: "${observable_result_or_state}"
+    source_refs: []
+
+# The workflow contract is language-neutral. A repository language pack supplies
+# the concrete step-definition syntax, imports, and assertion conventions.
