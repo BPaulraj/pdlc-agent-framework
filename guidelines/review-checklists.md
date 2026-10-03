@@ -11,7 +11,11 @@ Reviewers are independent: judge the artifacts against the story, the guidelines
 - [ ] Preconditions and test data are concrete, synthetic, and support independent runs.
 - [ ] Techniques fit the inputs: boundaries on ranges, decision tables on interacting rules.
 - [ ] No duplicates within the set or against the master pack.
+- [ ] Every `existing_coverage` entry cites a real master-pack id, its `evidence` is quoted from that case's steps, and its verdict holds. `full` only when every value and boundary of the condition is asserted. `full`/`partial` cases are in a reusable state (`master_pack.reusable_states`), and no `full` verdict sits on an AC that introduces new behaviour (**major**).
+- [ ] Every AC has `search_terms`, and a spot-check of them finds no obvious missed match.
+- [ ] Every `existing_coverage` entry appears in the regression selection (or is excluded with a reason). `conflicts` entries are flagged `needs_update`.
 - [ ] Priorities reflect risk.
+- [ ] Every case has an `area_path` that is its module (not the story's team path) and appears in the master pack's known area paths or in a human answer, or is `null` with an open `area_path_questions` entry. Every `test_type` is a key of `test_plan.iteration_paths`.
 - [ ] Regression selections have credible reasons. Must-run covers every directly impacted module, near-misses are listed, and gaps are reported, not hidden.
 - [ ] Master-pack cases whose expected behaviour changes are flagged `needs_update`.
 

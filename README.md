@@ -61,7 +61,7 @@ Details: [docs/agent-catalog.md](docs/agent-catalog.md) · Flow and states: [doc
    ```
    Questions for the PO/BA are written to `runs/US-1001/03-clarification/questions-round-1.md`. Put answers in `answers-round-1.md` and run `/pdlc-run US-1001` again.
 4. **Build the automation index.** It runs automatically at the automation stage. Afterwards, check `.pdlc/cache/automation-index/repo-profile.yaml` → `suggested_checks`, verify the commands, and copy them into `automation.checks`. Only those commands can ever be executed.
-5. **Connect ADO:** fill in `azure_devops.*`, including `test_plan.plan_id`, `parent_suite_id` and `master_pack.plan_id`. Set a PAT (Work Items R/W, Test Management R/W) in the `ADO_PAT` environment variable, then set `enabled: true`.
+5. **Connect ADO:** fill in `azure_devops.*`, including `test_project` (if test cases live in a different project from stories), `test_plan.team_plans` (team area path → test plan id), `test_plan.iteration_paths` (test type → iteration path) and `master_pack.plan_id`. Set a PAT (Work Items R/W, Test Management R/W) in the `ADO_PAT` environment variable, then set `enabled: true`.
 6. **Automatic start on sprint scope:** schedule the watcher, for example every 15 minutes with Windows Task Scheduler:
    ```
    python scripts/sprint_watcher.py            # one pass: start new in-sprint stories, resume answered/approved ones

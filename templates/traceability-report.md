@@ -9,6 +9,7 @@
 | Acceptance criterion | Test cases (ADO id) | Automated scenario | Last result |
 |---|---|---|---|
 | AC-1 ... | TC-... (#12345) | features/...:12 | passed / not run |
+| AC-2 ... | existing #20431 (full) | Automated (master pack) | passed / not run |
 
 ## Regression scope
 {counts by must/should/could; suite link; gaps.}

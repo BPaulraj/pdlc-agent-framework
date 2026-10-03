@@ -13,8 +13,30 @@ story_title: "..."
 coverage_summary:                   # every refined AC must appear here
   - acceptance_criterion: AC-1
     test_cases: [TC-US1234-001, TC-US1234-002]
+    existing_cases: [20431]         # master-pack ids from existing_coverage for this AC
+    search_terms: [coupon, discount, promo code]   # terms searched in the master pack for this AC
+existing_coverage:                  # master-pack cases that already cover a condition; [] = searched, none found
+  - acceptance_criterion: AC-1
+    condition: "valid coupon reduces the cart total"
+    master_pack_id: 20431
+    master_pack_title: "..."
+    verdict: "full | partial | conflicts"
+    # full:      the existing case asserts this condition exactly; no new case is written
+    # partial:   it covers part of it; new_case_keys cover only the delta
+    # conflicts: it asserts behaviour this story changes; new cases cover the new behaviour
+    evidence: "step 4 expected: 'Discount line shows -$10.00'"   # quoted from the case's steps, not its title
+    delta: null                     # partial/conflicts: what the existing case does not (or no longer) cover
+    new_case_keys: []               # partial/conflicts: the new cases written for the delta
+area_path_questions:                # modules with no known area path; answered by a human at G1. [] = none
+  - case_keys: [TC-US1234-003]
+    module: "Gmail > Messages > Drafts"           # from impact analysis
+    closest_known: "Gmail\\Messages\\Inbox"        # nearest area path in the master pack index, or null
+    question: "No area path exists for Drafts. Should a new one be created, and what is its full path?"
+    answer: null                    # filled from the human's G1 feedback, e.g. "Gmail\\Messages\\Drafts"
 test_cases:
   - key: TC-US1234-001              # stable key, never reused; survives reworks
+    area_path: "Gmail\\Messages\\Inbox"   # module path from the master pack's known area paths; null while its question is open
+    test_type: functional           # key of azure_devops.test_plan.iteration_paths in config/framework.yaml
     title: "Verify <behaviour> when <condition>"    # unique; <= 128 chars
     objective: "the single behaviour this case proves"
     type: "positive | negative | boundary | permission | state_transition | error_handling | integration | ui | accessibility | security"

@@ -74,8 +74,9 @@ stages:
   - id: test-design
     kind: agent
     agent: pdlc-test-designer
+    before: ["python scripts/ado.py export-master-pack --if-stale"]
     outputs: [06-test-design/test-cases.yaml]
-    guidelines: [guidelines/agent-contract.md, guidelines/test-design.md, "test-design-packs/"]
+    guidelines: [guidelines/agent-contract.md, guidelines/test-design.md, guidelines/regression-selection.md, "test-design-packs/"]
     templates: [templates/functional-test-case.yaml]
 
   - id: test-data

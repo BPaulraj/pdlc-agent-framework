@@ -10,6 +10,7 @@ selected:
     title: "..."
     suite: "Regression / Checkout / Promotions"
     module: "Checkout > Promotions"
+    source: "existing_coverage | search"   # existing_coverage = listed by test design in test-cases.yaml
     reason: "directly exercises the discount calculation this story changes"
     relation: "direct | dependency | shared_data | shared_ui | integration | historical_defect_area"
     priority: "must_run | should_run | could_run"

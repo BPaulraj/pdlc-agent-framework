@@ -20,8 +20,9 @@ paths:
 azure_devops:
   enabled: false                 # false = offline mode: stories from local JSON, ADO writes become local files
   organization: SET_ME           # https://dev.azure.com/<organization>
-  project: SET_ME
-  team: SET_ME                   # used for @CurrentIteration in the sprint watcher
+  project: SET_ME                # project holding the user stories
+  test_project: ""               # project holding the test plans and test cases; "" = same as project
+  team: SET_ME                  # used for @CurrentIteration in the sprint watcher
   pat_env_var: ADO_PAT           # scopes: Work Items (Read & Write), Test Management (Read & Write)
   api_version: "7.1"
   story_types: [User Story, Product Backlog Item]
@@ -35,19 +36,32 @@ azure_devops:
     closed_states: [Closed, Done, Resolved]
     tags: [pdlc, clarification]
 
-  test_plan:
-    plan_id: SET_ME              # plan where the sprint's new test cases go
-    parent_suite_id: SET_ME      # suite under which a per-story suite is created
-    suite_strategy: requirement_based   # requirement_based | static
-    create_regression_suite: true       # static suite "US-<id> regression" with the selected master-pack cases
-    area_path: ""                # "" = inherit from story
+  test_plan:                     # all in test_project
+    # Story area path (team path) -> that team's test plan id. Longest matching prefix wins, so a story
+    # under "Product\Scrum Team 1\Sub" still maps to "Product\Scrum Team 1".
+    team_plans: {}
+      # "Product\\Scrum Team 1": 101
+      # "Product\\Scrum Team 2": 102
+    # Sprint = last segment of the story's iteration path, e.g. Product\Scrum Team 1\26.3.7 -> 26.3.7.
+    # A static suite with that name in the team plan is reused, or created at the plan root.
+    sprint_name_pattern: '^\d{2}\.[1-4]\.\d+$'   # YY.Q.N
+    suite_strategy: requirement_based   # per-story suite under the sprint suite: requirement_based | static
+    regression_suite_name: "{sprint} Regression"        # static suite per sprint, at the plan root
+    story_regression_suite_name: "{story} regression"   # query-based suite per story under it (selected ids)
+    # test_type on each designed case -> iteration path set on the new test case (the type of testing,
+    # never the story's sprint). Full paths as ADO shows them, starting with the test project name.
+    iteration_paths:
+      functional: SET_ME                    # e.g. Gmail\Testing\Functional
+      system_integration_internal: SET_ME   # e.g. Gmail\Testing\SystemIntegration\Internal
     tags: [pdlc-generated]
 
   master_pack:
     source: ado_test_plan        # ado_test_plan | local_jsonl
-    plan_id: SET_ME              # regression/master plan
+    plan_id: SET_ME              # master pack plan (in test_project)
     local_path: ""               # used when source = local_jsonl (one test case JSON per line)
-    max_age_hours: 24            # re-export when older
+    max_age_hours: 24            # re-sync when older (incremental: only new/changed revisions are re-fetched)
+    full_refresh_days: 7         # force a full re-fetch this often as a safety net (shared-step edits are tracked incrementally)
+    reusable_states: [Ready]     # master-pack case states test design may reuse as story coverage
 
 automation:
   base_ref: main                 # branch/commit the worktree is created from

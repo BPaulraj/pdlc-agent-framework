@@ -13,7 +13,7 @@ Each control below states how it is enforced. "Instruction" means the agent is t
 | Nothing beyond the manifest changes | **Enforced:** `pdlc.py verify-diff` (out-of-manifest / not-applied / content-mismatch / uncommitted); the reviewer marks any hit as blocking |
 | No push or merge | **Enforced:** `git push` is denied in `.claude/settings.json`; no script pushes |
 | Run state and approvals can't be forged by agents | **Enforced:** the hook blocks writes to `runs/*/state.json`; `approve`/`reject` skills are human-invoked only (`disable-model-invocation`) |
-| ADO writes are limited to specific shapes | **Enforced:** only `ado.py` holds the PAT and it can only create the clarification task, Test Cases, suites, a story tag and a report comment. Bugs are drafts only |
+| ADO writes are limited to specific shapes | **Enforced:** only `ado.py` holds the PAT and it can only create the clarification task, Test Cases, suites, a story tag and a report comment, and add a Tested By link from G1-approved reused master-pack cases to the story (never editing their content). Bugs are drafts only |
 | Test cases are uploaded exactly as approved | **Enforced:** `publish-test-cases` verifies the G1 and G3 hashes; it is idempotent through the receipt |
 | Commands run only from an allowlist | **Enforced:** `pdlc.py run-check` executes only `automation.checks.*` from config, inside the worktree, with a timeout |
 

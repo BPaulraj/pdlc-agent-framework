@@ -407,11 +407,30 @@ def _require_gate_is_current(cfg, story, state, gate_id):
     return nxt
 
 
+TEST_CASES = "06-test-design/test-cases.yaml"
+
+
+def open_area_path_questions(cfg, story) -> list[str]:
+    doc = load_yaml(run_path(cfg, story) / TEST_CASES) or {}
+    open_q = [f"{', '.join(q.get('case_keys') or [])}: {q.get('question') or q.get('module')}"
+              for q in doc.get("area_path_questions") or [] if not q.get("answer")]
+    open_q += [f"{tc.get('key')}: no area_path" for tc in doc.get("test_cases") or []
+               if not tc.get("area_path") and not any(tc.get("key") in (q.get("case_keys") or [])
+                                                      for q in doc.get("area_path_questions") or [])]
+    return open_q
+
+
 def cmd_approve(cfg, args):
     story = story_key(args.story)
     state = load_state(cfg, story)
     gate = _gate(load_pipeline(), args.gate)
     _require_gate_is_current(cfg, story, state, gate["id"])
+    if TEST_CASES in (gate.get("review") or []):
+        open_q = open_area_path_questions(cfg, story)
+        if open_q:
+            die("cannot approve: test cases still have open area path questions. Answer them with\n"
+                f"  /pdlc-reject {story} {gate['id']} \"<case keys>: use area path <full path>\"\n"
+                "(create any new area path in ADO first). Open:\n  " + "\n  ".join(open_q))
     h, files = gate_hash(cfg, story, gate)
     state["approvals"][gate["id"]] = {"decision": "approved", "by": who(args.by), "at": now(),
                                       "comment": args.comment or "", "hash": h, "files": files}
@@ -496,10 +515,21 @@ def cmd_gate_summary(cfg, args):
             for key in ("test_cases", "selected", "excluded", "gaps", "findings", "files", "scenarios", "data_sets"):
                 if isinstance(data.get(key), list):
                     bits.append(f"{len(data[key])} {key}")
+            cov = data.get("existing_coverage")
+            if isinstance(cov, list) and cov:
+                verdicts: dict[str, int] = {}
+                for e in cov:
+                    verdicts[str(e.get("verdict"))] = verdicts.get(str(e.get("verdict")), 0) + 1
+                bits.append("reused master-pack coverage: " + ", ".join(f"{n} {v}" for v, n in sorted(verdicts.items())))
             if data.get("decision"):
                 bits.append(f"decision: {data['decision']}")
             line += f" — {', '.join(bits)}" if bits else ""
         print(line)
+    open_q = open_area_path_questions(cfg, story) if TEST_CASES in files else []
+    if open_q:
+        print("\n**Open area path questions (must be answered before approval):**\n" +
+              "\n".join(f"- {q}" for q in open_q) +
+              f"\nAnswer with: /pdlc-reject {story} {gate['id']} \"<case keys>: use area path <full path>\"")
     print(f"\nApprove: /pdlc-approve {story} {gate['id']}\nReject:  /pdlc-reject {story} {gate['id']} <feedback>")
 
 
