@@ -15,9 +15,22 @@ Never Read the whole JSONL or Grep it without `-o`.
 
 **Shared steps** are inlined where each case references them, and every such step carries `"shared_step": <id>`; each case also lists its `shared_step_refs`. A step reading `[shared step N not available]` means that content couldn't be read, so don't judge coverage from the rest of the case alone.
 
+## Area path and test type drive the shortlist
+A master-pack case's **area path** is the functional module it tests, and its **iteration path** is its test type. Map iteration paths to test types through `azure_devops.test_plan.iteration_paths` in `config/framework.yaml` (e.g. `...\Testing\Functional` → `functional`, `...\Testing\SystemIntegration\Internal` → `system_integration_internal`).
+- **Area path first.** Grep `master-pack-index.tsv` for each area path in `04-impact/impact-analysis.yaml` (a path also matches its sub-paths):
+  - `functional_modules[].area_paths` → **direct** candidates.
+  - `dependencies_at_risk[].area_paths` → **dependency** candidates.
+  - The `area_path` values on this story's new cases in `test-cases.yaml` → also direct candidates.
+- **Test type by what changed:**
+  - Impacted modules need **functional** regression from their area paths.
+  - Every interface with `integration_scope: internal` or `external`, and every cross-system dependency, needs **integration** regression: cases whose test type is an integration type and whose steps exercise that interface. If none exists, record a gap with `test_type` set; never paper over it with functional cases.
+- **Keywords second.** Then search titles and step text with the module's terms, to catch cases filed under another module's area path (journeys, shared screens). Mark these with their real area path; they are usually `shared_ui`, `shared_data` or `integration` relations.
+- Area path narrows the search; it doesn't make a case relevant on its own. Judge every candidate from its steps.
+- If impact analysis has no area paths (disabled, or none fit), fall back to keyword search and say so in your summary.
+
 ## Selecting from the master pack
 - When the story changes behaviour inside a shared step, every case using it is affected. Find them all in the `shared_step_refs` column of `master-pack-index.tsv` (Grep `\b<id>\b`), flag them `needs_update`, and note in `update_note` that the fix belongs in shared step `<id>` once, not in each case.
-- Start from the impacted modules and dependencies, then search the master pack by suite path, area path, title keywords, and step text (entity names, screen names, API names).
+- Start from the area paths and test types above, then widen with keywords: suite path, title and step text (entity names, screen names, API names).
 - Relations, strongest first: **direct** (tests the changed behaviour), **dependency** (tests a consumer or provider), **shared_data**, **shared_ui**, **integration**, **historical_defect_area**.
 - Priority:
   - **must_run:** direct, or dependency with high risk.

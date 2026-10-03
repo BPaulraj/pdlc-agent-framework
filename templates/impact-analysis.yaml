@@ -4,6 +4,7 @@ story_id: "US-1234"
 application_repo_revision: "commit or 'working copy'"
 functional_modules:                 # business capabilities affected
   - module: "Checkout > Promotions"
+    area_paths: ["Shop\\Checkout\\Promotions"]   # test-case area paths for this module, from the master pack's known area paths; [] = none fits (explain in unknowns)
     change_type: "new | modified | indirectly_affected"
     confidence: "high | medium | low"
     evidence: ["src/checkout/promo/CouponService.java:42 - applies discounts", "AC-3"]
@@ -14,9 +15,11 @@ code_components:                    # concrete code likely to change or be touch
 interfaces:                         # APIs, events, DB tables, files, third parties
   - name: "POST /api/cart/{id}/coupon"
     change: "new | contract_change | behaviour_change | unchanged_consumer"
+    integration_scope: "none | internal | external"   # does it cross a system boundary? internal/external -> needs integration regression
     consumers: []
 dependencies_at_risk:               # modules sharing code/data with the change -> regression candidates
   - module: "Order history"
+    area_paths: ["Shop\\Orders\\History"]
     via: "shared OrderTotal calculation"
     risk: "medium"
 existing_automation_touchpoints:    # automation repo areas that exercise these modules

@@ -2,15 +2,22 @@
 schema_version: 1
 story_id: "US-1234"
 master_pack_snapshot: "exported_at from .pdlc/cache/master-pack/meta.json"
-selection_basis:                    # impacted modules / dependencies from impact analysis and story
+selection_basis:                    # impacted modules / dependencies / interfaces from impact analysis and story
   - module: "Checkout > Promotions"
+    area_paths: ["Shop\\Checkout\\Promotions"]
+    needs: [functional]             # test types this basis requires
     reason: "directly modified"
+  - interface: "POST /api/cart/{id}/coupon"
+    needs: [system_integration_internal]
+    reason: "contract change consumed by the order service"
 selected:
   - id: 20431                       # ADO test case id (or master-pack id)
     title: "..."
     suite: "Regression / Checkout / Promotions"
     module: "Checkout > Promotions"
-    source: "existing_coverage | search"   # existing_coverage = listed by test design in test-cases.yaml
+    area_path: "Shop\\Checkout\\Promotions"
+    test_type: functional           # from the case's iteration path via test_plan.iteration_paths
+    source: "existing_coverage | area_path | keyword"   # how it was found; existing_coverage = listed by test design
     reason: "directly exercises the discount calculation this story changes"
     relation: "direct | dependency | shared_data | shared_ui | integration | historical_defect_area"
     priority: "must_run | should_run | could_run"
@@ -23,6 +30,7 @@ excluded_near_misses:               # plausible candidates deliberately left out
     reason: "covers gift cards, which share no code path with coupons"
 gaps:                               # impacted behaviour with no master-pack coverage
   - module: "Order history"
+    test_type: functional
     missing: "no test verifies discounted totals appear in order history"
     recommendation: "add to master pack after this sprint (see pack curation)"
 obsolete_candidates: []             # master-pack cases this story makes invalid
@@ -30,4 +38,5 @@ execution_estimate:
   must_run: 0
   should_run: 0
   could_run: 0
+  by_test_type: {functional: 0, system_integration_internal: 0}
   automated_share: "0%"

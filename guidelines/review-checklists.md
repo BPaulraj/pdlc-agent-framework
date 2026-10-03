@@ -18,6 +18,7 @@ Reviewers are independent: judge the artifacts against the story, the guidelines
 - [ ] Every case has an `area_path` that is its module (not the story's team path) and appears in the master pack's known area paths or in a human answer, or is `null` with an open `area_path_questions` entry. Every `test_type` is a key of `test_plan.iteration_paths`.
 - [ ] Regression selections have credible reasons. Must-run covers every directly impacted module, near-misses are listed, and gaps are reported, not hidden.
 - [ ] Master-pack cases whose expected behaviour changes are flagged `needs_update`.
+- [ ] Every impacted module's area paths have functional regression or a declared gap. Every interface crossing a system boundary (`integration_scope` internal/external) has integration-type regression or a declared gap. Each selected case shows its `area_path` and `test_type`.
 
 ### Per-interface checks (test-design-packs/<interface>/)
 - [ ] `web-ui`: elements named by visible label, not selector; `interface_details` present only when the case genuinely depends on viewport/browser.

@@ -59,6 +59,7 @@ stages:
     kind: agent
     agent: pdlc-impact-analyst
     enabled_by: impact_analysis
+    before: ["python scripts/ado.py export-master-pack --if-stale"]
     outputs: [04-impact/impact-analysis.yaml]
     guidelines: [guidelines/agent-contract.md, guidelines/regression-selection.md]
     templates: [templates/impact-analysis.yaml]
